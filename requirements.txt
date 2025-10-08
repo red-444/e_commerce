@@ -11,3 +11,5 @@ Flask-SQLAlchemy
 Flask-Migrate
 Flask-Mail
 psycopg2-binary
+razorpay
+psycopg2-binary
