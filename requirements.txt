@@ -10,3 +10,4 @@ packaging
 Flask-SQLAlchemy
 Flask-Migrate
 Flask-Mail
+psycopg2-binary
