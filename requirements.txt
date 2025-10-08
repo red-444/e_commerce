@@ -10,10 +10,7 @@ packaging
 Flask-SQLAlchemy
 Flask-Migrate
 Flask-Mail
-psycopg2-binary
+Flask-Cors
+python-dotenv
 razorpay
 psycopg2-binary
-python-dotenv
-Flask-Cors
-
-
