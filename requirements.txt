@@ -4,3 +4,9 @@ Werkzeug
 itsdangerous
 Jinja2
 click
+blinker
+markupsafe
+packaging
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Mail
