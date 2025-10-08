@@ -14,4 +14,6 @@ psycopg2-binary
 razorpay
 psycopg2-binary
 python-dotenv
+Flask-Cors
+
 
