@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Inventory Logs{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Inventory Logs</h2>
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Date</th><th>Product</th><th>Change Type</th>
+                <th>Before</th><th>After</th><th>Reason</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log, product in logs %}
+            <tr>
+                <td>{{ log.createdat.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ product.name }}</td>
+                <td><span class="badge bg-info">{{ log.changetype }}</span></td>
+                <td>{{ log.stockbefore }}</td>
+                <td>{{ log.stockafter }}</td>
+                <td>{{ log.reason }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

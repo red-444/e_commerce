@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 bg-white shadow-sm vh-100 p-3">
+      <div class="text-center">
+        <img src="{{ user.profile_pic or url_for('static', filename='images/default_profile.png') }}" 
+             alt="Profile" class="rounded-circle mb-2" width="80" height="80">
+        <h5>{{ user.username }}</h5>
+        <p class="text-muted">{{ user.email }}</p>
+      </div>
+      <hr>
+      <ul class="nav flex-column">
+        <li class="nav-item"><a href="{{ url_for('user.dashboard') }}" class="nav-link active">Profile</a></li>
+        <li class="nav-item"><a href="{{ url_for('product.products') }}" class="nav-link">Products</a></li>
+        <li class="nav-item"><a href="{{ url_for('cart.view_cart') }}" class="nav-link">My Cart</a></li>
+        <li class="nav-item"><a href="{{ url_for('order.place_order') }}" class="nav-link">My Orders</a></li>
+        <li class="nav-item"><a href="{{ url_for('user.logout') }}" class="nav-link text-danger">Logout</a></li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9 col-lg-10 p-4">
+      <h3 class="mb-4">Welcome, {{ user.fullname or user.username }} 👋</h3>
+
+      <div class="row">
+        <!-- Stats Cards -->
+        <div class="col-md-4">
+          <div class="card shadow-sm mb-4 text-center">
+            <div class="card-body">
+              <h5>Total Orders</h5>
+              <h2>{{ total_orders }}</h2>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card shadow-sm mb-4 text-center">
+            <div class="card-body">
+              <h5>Wallet Balance</h5>
+              <h2>₹{{ wallet_balance }}</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Orders -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          Recent Orders
+        </div>
+       <h3>Recent Orders</h3>
+<table>
+  <tr>
+    <th>Order ID</th>
+    <th>Date</th>
+    <th>Status</th>
+    <th>Amount</th>
+  </tr>
+  {% for order in recent_orders %}
+  <tr>
+    <td>{{ order.id }}</td>
+    <td>{{ order.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+    <td>{{ order.status }}</td>
+    <td>₹{{ order.total_amount }}</td>
+  </tr>
+  {% endfor %}
+</table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

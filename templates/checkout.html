@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - E-Commerce{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4">Checkout</h2>
+  <form id="checkoutForm" onsubmit="return false;">
+    <div class="mb-3">
+      <label class="form-label">Full Name</label>
+      <input name="name" id="nameInput" class="form-control" required />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input name="email" id="emailInput" class="form-control" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Shipping Address</label>
+      <input name="address" id="addressInput" class="form-control" required />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Phone</label>
+      <input name="phone" id="phoneInput" class="form-control" type="tel" required />
+    </div>
+    <div class="mb-3">
+      <button type="button" class="btn btn-dark" id="sendOtpBtn">Send OTP</button>
+    </div>
+  </form>
+
+  <!-- OTP Section -->
+  <div id="otpSection" class="p-4 mt-3 bg-dark text-white rounded d-none">
+    <h5><i class="fas fa-key me-2"></i>Verify OTP</h5>
+    <p class="text-muted text-white-50">An OTP has been sent to your email and/or mobile.</p>
+    <form id="otpForm">
+      <div class="mb-3">
+        <input type="text" class="form-control" id="otp" placeholder="Enter 6-digit OTP" required />
+      </div>
+      <button type="submit" class="btn btn-success w-100">Verify OTP</button>
+    </form>
+    <div class="text-center mt-2">
+      <a href="#" class="text-info" id="resendOtp">Resend OTP</a>
+    </div>
+    <div id="otpMessage" class="mt-3 text-center text-white"></div>
+  </div>
+
+  <!-- Payment Section -->
+  <div id="paymentSection" style="display: none; margin-top: 20px;">
+    <button class="btn btn-primary btn-lg" id="payBtn">Pay Now</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const otpForm = document.getElementById("otpForm");
+  const otpSection = document.getElementById("otpSection");
+  const msgBox = document.getElementById("otpMessage");
+  const paymentSection = document.getElementById("paymentSection");
+  const sendOtpBtn = document.getElementById("sendOtpBtn");
+  const resendLink = document.getElementById("resendOtp");
+  const payBtn = document.getElementById("payBtn");
+
+  // Helper to show messages
+  function showMsg(html, isError = false) {
+    msgBox.innerHTML = html;
+    if (isError) msgBox.classList.add('text-danger');
+    else msgBox.classList.remove('text-danger');
+  }
+
+  // Send OTP (include email)
+  sendOtpBtn.addEventListener("click", async () => {
+    showMsg("");
+    const email = document.getElementById("emailInput").value;
+    if (!email) {
+      showMsg('<span class="text-warning">Please enter an email first.</span>', true);
+      return;
+    }
+
+    try {
+      const res = await fetch("/resend-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email }),
+        credentials: "include"
+      });
+      const data = await res.json();
+
+      if (res.ok && data.status === "success") {
+        otpSection.classList.remove("d-none");
+        let html = `<span class="text-success">📩 OTP sent successfully.</span>`;
+        // show debug OTP in dev mode when backend returns it
+        if (data.otp) {
+          html += `<br><small class="text-warning">DEBUG OTP: ${data.otp}</small>`;
+          console.debug("DEBUG OTP:", data.otp);
+        }
+        showMsg(html);
+      } else {
+        showMsg('❌ ' + (data.message || 'Failed to send OTP'), true);
+      }
+    } catch (err) {
+      console.error(err);
+      showMsg('Request error: ' + err.message, true);
+    }
+  });
+
+  // Resend link — reuse sendOtpBtn logic
+  resendLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    sendOtpBtn.click();
+  });
+
+  // Verify OTP
+  otpForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    showMsg("");
+    const otp = document.getElementById("otp").value;
+    const email = document.getElementById("emailInput").value;
+    if (!otp) { showMsg('<span class="text-danger">Please enter the OTP.</span>', true); return; }
+
+    try {
+      const res = await fetch("/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ otp: otp, email: email }),
+        credentials: "include"
+      });
+      const data = await res.json();
+
+      if (res.ok && data.status === "success") {
+        showMsg('<span class="text-success">✅ OTP verified!</span>');
+        otpSection.style.display = "none";
+        paymentSection.style.display = "block";
+      } else {
+        showMsg('❌ ' + (data.message || 'Invalid OTP'), true);
+      }
+    } catch (err) {
+      console.error(err);
+      showMsg('Request error: ' + err.message, true);
+    }
+  });
+
+  // Start Razorpay payment
+  async function startPayment() {
+    try {
+      const shipping_address = document.getElementById("addressInput").value;
+
+      const response = await fetch("/payment/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ shipping_address }),
+        credentials: "include"
+      });
+
+      const data = await response.json();
+      if (!response.ok || data.status !== "success") {
+        alert("Order creation failed: " + (data.message || response.statusText));
+        return;
+      }
+
+      const options = {
+        key: data.key,
+        amount: data.amount,
+        currency: data.currency,
+        name: "My E-Commerce",
+        description: "Order Payment",
+        order_id: data.razorpay_order_id,
+        handler: function (razorpayResponse) {
+          // Verify payment on server
+          fetch("/payment/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(razorpayResponse),
+            credentials: "include"
+          })
+          .then(res => res.json())
+          .then(result => {
+            if (result.status === "success") {
+              window.location.href = "/orders";
+            } else {
+              alert("❌ Payment verification failed: " + (result.message || 'Unknown'));
+            }
+          })
+          .catch(err => {
+            console.error("Payment verify request failed:", err);
+            alert("Payment verification request failed.");
+          });
+        },
+        prefill: {
+          name: document.getElementById("nameInput").value || "",
+          email: document.getElementById("emailInput").value || "",
+          contact: document.getElementById("phoneInput").value || ""
+        }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong: " + err.message);
+    }
+  }
+
+  payBtn.addEventListener("click", startPayment);
+});
+</script>
+{% endblock %}

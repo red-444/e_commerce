@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- Product Details -->
+    <div class="row mb-5 align-items-center">
+        <div class="col-md-6 text-center">
+            <img src="{{ product.image or url_for('static', filename='images/default.png') }}"
+                 class="img-fluid rounded shadow-lg" alt="{{ product.name }}"
+                 style="max-height: 400px; object-fit: contain;">
+        </div>
+        <div class="col-md-6">
+            <h2 class="fw-bold">{{ product.name }}</h2>
+            <p class="text-muted mb-1">{{ product.category }}</p>
+            <p class="lead text-success fw-bold">₹ {{ "%.2f"|format(product.price) }}</p>
+            <p class="mb-4">{{ product.description }}</p>
+
+            <!-- ✅ Stock Info -->
+            {% if product.stock_qty > 0 %}
+                <p class="text-success">In Stock: {{ product.stock_qty }}</p>
+            {% else %}
+                <p class="text-danger fw-bold">Out of Stock</p>
+            {% endif %}
+
+            <!-- ✅ Add to Cart -->
+            <form action="{{ url_for('cart.add_to_cart', product_id=product.product_id) }}" method="POST">
+                <button type="submit"
+                        class="btn btn-primary btn-lg w-100"
+                        {% if product.stock_qty == 0 %}disabled{% endif %}>
+                    {% if product.stock_qty == 0 %}
+                        Out of Stock
+                    {% else %}
+                        Add to Cart
+                    {% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <div class="related-products mt-5">
+        <h4 class="mb-4 text-center">You may also like</h4>
+        <div class="row g-4">
+            {% for rp in related_products %}
+            <div class="col-md-3 col-sm-6">
+                <div class="card h-100 shadow-sm">
+                    <img src="{{ rp.image or url_for('static', filename='images/default.png') }}"
+                         class="card-img-top p-3" alt="{{ rp.name }}"
+                         style="height: 200px; object-fit: contain;">
+                    <div class="card-body d-flex flex-column text-center">
+                        <h6 class="card-title">{{ rp.name }}</h6>
+                        <p class="text-muted small">{{ rp.category }}</p>
+                        <p class="fw-bold mb-3">₹ {{ "%.2f"|format(rp.price) }}</p>
+
+                        <!-- ✅ Related product stock -->
+                        {% if rp.stock_qty > 0 %}
+                            <p class="text-success small">In Stock: {{ rp.stock_qty }}</p>
+                        {% else %}
+                            <p class="text-danger small">Out of Stock</p>
+                        {% endif %}
+
+                        <a href="{{ url_for('product.product_detail', product_id=rp.product_id) }}"
+                           class="btn btn-outline-primary mt-auto">View</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

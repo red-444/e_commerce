@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Admin Dashboard</h2>
+    
+    <div class="row">
+        <!-- Total Products -->
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.products') }}" class="text-decoration-none">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-body text-center">
+                        <h5>Total Products</h5>
+                        <h3>{{ totalproducts }}</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Total Orders -->
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.orders') }}" class="text-decoration-none">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-body text-center">
+                        <h5>Total Orders</h5>
+                        <h3>{{ totalorders }}</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Pending Orders -->
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.orders') }}" class="text-decoration-none">
+                <div class="card text-white bg-warning mb-3">
+                    <div class="card-body text-center">
+                        <h5>Pending Orders</h5>
+                        <h3>{{ pendingorders }}</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Total Users -->
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.users') }}" class="text-decoration-none">
+                <div class="card text-white bg-danger mb-3">
+                    <div class="card-body text-center">
+                        <h5>Total Users</h5>
+                        <h3>{{ totalusers }}</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    {% if low_stock %}
+    <div class="alert alert-danger mt-3">
+        ⚠️ {{ low_stock }} products are at or below their reorder level!
+    </div>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{{ url_for('admin.products') }}" class="btn btn-primary">Manage Products</a>
+        <a href="{{ url_for('admin.orders') }}" class="btn btn-success">Manage Orders</a>
+        <a href="{{ url_for('admin.inventory') }}" class="btn btn-warning">Inventory Logs</a>
+        <a href="{{ url_for('admin.manageinventory') }}" class="btn btn-danger">Manage Inventory</a>
+    </div>
+</div>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}

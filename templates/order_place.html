@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Place Order</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+  <style>
+    .order-container {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .order-summary {
+      margin-bottom: 20px;
+      padding: 10px;
+      background: #f9f9f9;
+      border-radius: 8px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      border: none;
+      background: purple;
+      color: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background: darkviolet;
+    }
+    .text-center {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="order-container">
+    <h2>Confirm Your Order</h2>
+
+    <div class="order-summary">
+      <p><strong>User:</strong> {{ user.username }}</p>
+      <p><strong>Wallet Balance:</strong> ₹{{ user.wallet_balance }}</p>
+      <p><strong>Order Amount:</strong> ₹100</p> <!-- Replace with dynamic cart total -->
+    </div>
+
+    <form method="POST" action="{{ url_for('order.orders') }}">
+      <div class="text-center">
+        <button type="submit" class="btn">Place Order</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

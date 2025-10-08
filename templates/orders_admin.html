@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Manage Orders{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Orders</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for o in orders %}
+            <tr>
+                <td>{{ o.order_id }}</td>
+                <td>{{ o.user.username if o.user else 'N/A' }}</td>
+                <td>{{ o.order_status }}</td>
+                <td>
+                    <form action="{{ url_for('admin.update_order_status', order_id=o.order_id) }}" method="POST" class="d-inline">
+                        <select name="status" class="form-select form-select-sm">
+                            <option value="pending" {% if o.order_status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="shipped" {% if o.order_status == 'shipped' %}selected{% endif %}>Shipped</option>
+                            <option value="delivered" {% if o.order_status == 'delivered' %}selected{% endif %}>Delivered</option>
+                            <option value="cancelled" {% if o.order_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,264 @@
+/* Reset & Base Typography */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #fdfdfd;
+    color: #222;
+    line-height: 1.6;
+}
+a {
+    text-decoration: none;
+    color: #0077cc;
+}
+a:hover {
+    color: #00509e;
+}
+
+/* Layout Containers */
+.container,
+.container-fluid {
+    width: 100%;
+    padding: 1rem 2%;
+}
+
+/* Navbar */
+.navbar {
+    border-bottom: 2px solid #ffcc00;
+    font-family: monospace;
+}
+.navbar-brand {
+    color: #ffcc00 !important;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #000;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 0;
+    font-family: monospace;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+.btn-primary {
+    background-color: #0077cc;
+    border-color: #005fa3;
+}
+.btn-primary:hover {
+    background-color: #005fa3;
+}
+
+/* Cards */
+.card {
+    border-radius: 0;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 0 #999;
+}
+.card-header {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    font-family: monospace;
+}
+.card-body {
+    background-color: #fff;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 0;
+    font-family: monospace;
+}
+
+/* Tables */
+.table th,
+.table td {
+    vertical-align: middle;
+    font-family: monospace;
+}
+
+/* Forms */
+input, select, textarea {
+    border-radius: 0;
+    font-family: monospace;
+}
+
+/* Footer */
+footer {
+    background-color: #222;
+    color: #eee;
+    font-size: 14px;
+    font-family: monospace;
+    padding-top: 2rem;
+}
+
+/* Utility */
+.text-muted {
+    color: #666 !important;
+}
+.text-primary {
+    color: #0077cc !important;
+}
+.badge {
+    font-family: monospace;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .navbar .navbar-collapse {
+        background-color: #111;
+        padding: 1rem;
+    }
+    .card {
+        margin-bottom: 1rem;
+    }
+}
+/* Retro Base Theme */
+body {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #fffdf7;
+    color: #222;
+    line-height: 1.6;
+    transition: background 0.3s ease;
+}
+
+a {
+    color: #0077cc;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #003366;
+}
+
+/* Navbar */
+.navbar {
+    font-family: monospace;
+    background-color: #000;
+    border-bottom: 3px dashed #ffcc00;
+    animation: slideDown 1s ease;
+}
+
+.navbar-brand {
+    color: #ffcc00 !important;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 0 #000;
+    animation: glow 1.5s infinite alternate;
+}
+
+/* Button Glow Animation */
+@keyframes glow {
+    0% { text-shadow: 0 0 2px #ff0; }
+    100% { text-shadow: 0 0 10px #ff0, 0 0 20px #ff0; }
+}
+
+/* Slide Down Entry */
+@keyframes slideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Cards with Retro Shadow */
+.card {
+    border: 1px solid #444;
+    box-shadow: 4px 4px 0 #000;
+    border-radius: 0;
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: scale(1.01);
+}
+
+/* Buttons */
+.btn {
+    font-family: monospace;
+    border-radius: 0;
+    letter-spacing: 1px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: #3333ff;
+    border-color: #0000aa;
+}
+
+.btn-primary:hover {
+    background-color: #0000aa;
+    transform: scale(1.05);
+}
+
+/* Alerts */
+.alert {
+    border-left: 5px solid #ffc107;
+    border-radius: 0;
+    animation: fadeIn 1s;
+}
+
+/* Smooth Fade-in */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Retro Tables */
+.table th,
+.table td {
+    font-family: monospace;
+    vertical-align: middle;
+}
+
+/* Footer */
+footer {
+    background-color: #111;
+    color: #eee;
+    padding: 2rem 0;
+    font-family: monospace;
+}
+
+/* Utility Classes */
+.text-muted {
+    color: #666 !important;
+}
+
+.badge {
+    font-family: monospace;
+    padding: 0.4em 0.6em;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .navbar .navbar-collapse {
+        background: #000;
+    }
+    .card {
+        margin-bottom: 1rem;
+    }
+}
+.cart-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #000;
+    color: #ffcc00;
+    padding: 10px 20px;
+    border: 2px dashed #ffcc00;
+    font-family: monospace;
+    box-shadow: 3px 3px 0 #000;
+    z-index: 9999;
+    animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

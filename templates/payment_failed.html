@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payment Failed - E-Commerce</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container py-5 text-center">
+    <i class="fas fa-times-circle fa-5x text-danger mb-4"></i>
+    <h2>Payment Failed</h2>
+    <p class="lead">Unfortunately, your payment couldn't be processed.</p>
+
+    <div class="card mx-auto mt-4" style="max-width: 500px;">
+      <div class="card-body text-start">
+        <h5>Order Info</h5>
+        <p><strong>Order ID:</strong> #1002</p>
+        <p><strong>Amount:</strong> ₹2000</p>
+        <p><strong>Status:</strong> <span class="badge bg-danger">Failed</span></p>
+      </div>
+    </div>
+
+    <div class="alert alert-warning mt-4">
+      <i class="fas fa-info-circle me-2"></i> Please retry the payment or contact support.
+    </div>
+
+    <a href="payment.html" class="btn btn-primary me-2">
+      <i class="fas fa-redo me-1"></i>Retry Payment
+    </a>
+    <a href="cart.html" class="btn btn-secondary">
+      <i class="fas fa-shopping-cart me-1"></i>Back to Cart
+    </a>
+  </div>
+  
+  
+<script src="js/main.js"></script>
+
+</body>
+</html>

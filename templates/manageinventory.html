@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Manage Inventory{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Manage Inventory</h2>
+
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Stock</th>
+                <th>Reserved</th>
+                <th>Reorder Level</th>
+                <th>Supplier</th>
+                <th>Last Restock</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product, inv in rows %}
+            <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ inv.stock_quantity if inv else 0 }}</td>
+                <td>{{ inv.reserved_stock if inv else 0 }}</td>
+                <td>{{ inv.reorder_level if inv else '-' }}</td>
+                <td>{{ inv.supplier_name if inv else '-' }}</td>
+                <td>{{ inv.last_restock_date if inv else '-' }}</td>
+                <td>
+                    <form action="{{ url_for('admin.save_inventory', productid=product.productid) }}" method="POST" class="row g-2">
+                        <input type="hidden" name="inventory_id" value="{{ inv.inventory_id if inv else '' }}">
+                        <div class="col-md-2"><input class="form-control" type="number" name="stock_quantity" value="{{ inv.stock_quantity if inv else 0 }}" placeholder="Stock"></div>
+                        <div class="col-md-2"><input class="form-control" type="number" name="reserved_stock" value="{{ inv.reserved_stock if inv else 0 }}" placeholder="Reserved"></div>
+                        <div class="col-md-2"><input class="form-control" type="number" name="reorder_level" value="{{ inv.reorder_level if inv else 0 }}" placeholder="Reorder"></div>
+                        <div class="col-md-2"><input class="form-control" type="text" name="supplier_name" value="{{ inv.supplier_name if inv else '' }}" placeholder="Supplier"></div>
+                        <div class="col-md-2"><input class="form-control" type="date" name="last_restock_date" value="{{ inv.last_restock_date if inv else '' }}"></div>
+                        <div class="col-md-2"><button class="btn btn-sm btn-primary w-100">Save</button></div>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

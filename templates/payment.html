@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - E-Commerce{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4">Checkout</h2>
+    <button id="payBtn" class="btn btn-primary">Pay Now</button>
+</div>
+
+<!-- Razorpay Checkout Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.getElementById("payBtn").addEventListener("click", async function() {
+    try {
+        // Step 1: Ask backend to create order
+        const response = await fetch("/payment/create-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                user_id: "{{ session['user_id'] }}",   // logged-in user
+                product_id: 1,                        // example product
+                quantity: 1,
+                shipping_address: "Coimbatore"        // test value
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.status === "success") {
+            // Step 2: Configure Razorpay popup
+            var options = {
+                "key": data.key,                       // ✅ from backend
+                "amount": data.amount,                 // already in paise
+                "currency": data.currency,
+                "name": "My E-Commerce App",
+                "description": "Order Payment",
+                "order_id": data.razorpay_order_id,
+                "handler": async function (response) {
+                    // Step 3: Verify payment
+                    const verifyRes = await fetch("/payment/verify", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(response)
+                    });
+                    const result = await verifyRes.json();
+                    if (result.status === "success") {
+                        alert("✅ Payment verified and order updated!");
+                        window.location.href = "/";
+                    } else {
+                        alert("❌ Payment verification failed: " + result.message);
+                    }
+                },
+                "prefill": {
+                    "name": "{{ session.get('username', 'Customer') }}",
+                    "email": "customer@example.com",
+                    "contact": "9999999999"
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        } else {
+            alert("Order creation failed: " + data.message);
+        }
+    } catch (err) {
+        console.error("Error:", err);
+        alert("Something went wrong!");
+    }
+});
+</script>
+{% endblock %}

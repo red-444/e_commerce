@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Manage Products{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Manage Products</h2>
+
+    <form action="{{ url_for('admin.products') }}" method="POST" class="row g-3 mb-4">
+        <div class="col-md-2"><input class="form-control" name="name" placeholder="Name"></div>
+        <div class="col-md-2"><input class="form-control" name="category" placeholder="Category"></div>
+        <div class="col-md-2"><input class="form-control" name="price" type="number" placeholder="Price"></div>
+        <div class="col-md-2"><input class="form-control" name="stockquantity" type="number" placeholder="Stock"></div>
+        <div class="col-md-2"><input class="form-control" name="imageurl" placeholder="Image URL"></div>
+        <div class="col-md-2"><button class="btn btn-primary w-100">Add</button></div>
+    </form>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in products %}
+            <tr>
+                <td>{{ p.name }}</td>
+                <td>{{ p.category }}</td>
+                <td>₹{{ p.price }}</td>
+                <td>{{ p.stockqty }}</td>
+                <td>
+                    <!-- Restock -->
+                    <form action="{{ url_for('admin.restock_product', productid=p.product_id) }}" method="POST" class="d-inline">
+                        <input type="number" name="quantity" placeholder="Qty" class="form-control d-inline w-50">
+                        <button class="btn btn-sm btn-success">Restock</button>
+                    </form>
+
+                    <!-- Adjust -->
+                    <form action="{{ url_for('admin.adjust_stock', productid=p.product_id) }}" method="POST" class="d-inline">
+                        <input type="number" name="stockqty" placeholder="New Qty" class="form-control d-inline w-50">
+                        <button class="btn btn-sm btn-warning">Adjust</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

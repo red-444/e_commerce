@@ -1,0 +1,58 @@
+/* General Admin Dashboard Styling */
+body {
+    background-color: #f8f9fa;
+}
+
+/* Dashboard Heading */
+h2.mb-4 {
+    font-weight: 600;
+    color: #343a40;
+    text-align: center;
+}
+
+/* Stat Cards */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Card Titles */
+.card-body h5 {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Card Numbers */
+.card-body h3 {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+/* Alert Box */
+.alert {
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Buttons Section */
+.mt-4 a.btn {
+    margin: 5px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 12px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    transition: all 0.2s ease-in-out;
+}
+
+.mt-4 a.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
