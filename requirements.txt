@@ -13,4 +13,5 @@ Flask-Mail
 psycopg2-binary
 razorpay
 psycopg2-binary
-dotenv git add requirements.txt
+python-dotenv
+
