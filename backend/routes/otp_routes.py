@@ -100,14 +100,12 @@ def resend_otp():
         email_status = send_email_smtp(final_email, otp_code)
 
         if not email_status:
-            # Debug fallback (local development)
-            print(f"DEBUG OTP for {final_email}: {otp_code}")
-            return jsonify({
-                "status": "success",
-                "otp": otp_code,
-                "message": "OTP generated (debug mode, not sent)",
-                "expires_at": expiry_time.isoformat() + "Z"
-            })
+             print(f"DEBUG OTP for {final_email}: {otp_code}")
+        return jsonify({
+        "status": "error",
+        "message": "Failed to send OTP email. Please try again later."
+    }), 500
+
 
         return jsonify({
             "status": "success",
