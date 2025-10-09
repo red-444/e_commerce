@@ -141,7 +141,7 @@ class OrderItem(db.Model):
 class OTPVerification(db.Model):
     __tablename__ = "otp_verification"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.userid"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.userid"), nullable=True)
     order_id = db.Column(db.Integer, db.ForeignKey("orders.order_id"), nullable=True)
     otp_code = db.Column(db.String(6), nullable=False)
     is_verified = db.Column(db.Boolean, default=False)
