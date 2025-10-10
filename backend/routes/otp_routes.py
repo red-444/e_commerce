@@ -1,69 +1,58 @@
 # backend/routes/otp_routes.py
-import hashlib
-import hmac
+import os
 import random
+import requests
 from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify, session
 from backend.models import Cart, OTPVerification, OrderItem, Product, User, Order
 from backend.extensions import db
-
-import os
 from dotenv import load_dotenv
-
-# smtp imports
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 
 load_dotenv()
 
-# ===== Razorpay config =====
-
-
 otp_bp = Blueprint("otp", __name__)
 
-# ===== OTP Utilities =====
+# ====== Utility Functions ======
 def generate_otp():
+    """Generate a 6-digit OTP."""
     return str(random.randint(100000, 999999)).zfill(6)
 
-def send_email_smtp(to_email, otp_code):
-    """
-    Send OTP using Gmail SMTP. Uses MAIL_USERNAME and MAIL_PASSWORD from env.
-    Returns True on success, False on failure (so caller can fallback to debug).
-    """
-    sender_email = os.getenv("MAIL_USERNAME")
-    sender_password = os.getenv("MAIL_PASSWORD")
 
-    if not sender_email or not sender_password:
-        print("❌ MAIL_USERNAME or MAIL_PASSWORD not set in environment; skipping SMTP send.")
+# ====== Resend API Email Sender ======
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
+
+def send_otp_email(to_email, otp):
+    """Send OTP email using Resend API."""
+    if not RESEND_API_KEY:
+        print("❌ RESEND_API_KEY not found in environment variables.")
         return False
 
-    msg = MIMEMultipart()
-    msg['From'] = sender_email
-    msg['To'] = to_email
-    msg['Subject'] = "Your OTP Code"
-
-    body = f"Your OTP code is: {otp_code}. It will expire in 5 minutes."
-    msg.attach(MIMEText(body, 'plain'))
+    url = "https://api.resend.com/emails"
+    headers = {
+        "Authorization": f"Bearer {RESEND_API_KEY}",
+        "Content-Type": "application/json",
+    }
+    data = {
+        "from": "Resend <onboarding@resend.dev>",
+        "to": [to_email],
+        "subject": "Your OTP Code",
+        "html": f"<h2>Your OTP is {otp}</h2><p>This code will expire in 5 minutes.</p>",
+    }
 
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=20)
-        server.ehlo()
-        server.starttls()
-        server.ehlo()
-        server.login(sender_email, sender_password)
-        server.send_message(msg)
-        server.quit()
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
         print(f"✅ OTP email sent to {to_email}")
         return True
     except Exception as e:
-        # Print full exception for debugging (will show reason in console)
-        print(f"❌ Failed to send OTP email: {e}")
+        print(f"❌ Failed to send OTP via Resend API: {e}")
         return False
 
-# ===== Routes =====
+
+# ====== Routes ======
 @otp_bp.route("/resend-otp", methods=["POST"])
 def resend_otp():
+    """Resend OTP to user email using Resend API."""
     try:
         user_id = session.get("user_id")
         data = request.get_json() or {}
@@ -73,13 +62,16 @@ def resend_otp():
         if not user_id and not email:
             return jsonify({"status": "error", "message": "Missing email"}), 401
 
-        user = None
-        if user_id:
-            user = User.query.get(user_id)
+        user = User.query.get(user_id) if user_id else None
+        final_email = email or (user.email if user else None)
+
+        if not final_email:
+            return jsonify({"status": "error", "message": "Email not found"}), 400
 
         otp_code = generate_otp()
         expiry_time = datetime.utcnow() + timedelta(minutes=5)
 
+        # Store OTP in DB
         if user_id:
             otp_entry = OTPVerification(
                 user_id=user_id,
@@ -92,20 +84,12 @@ def resend_otp():
             db.session.add(otp_entry)
             db.session.commit()
 
-        final_email = email or (user.email if user else None)
-        if not final_email:
-            return jsonify({"status": "error", "message": "Final email not found"}), 400
-
-        # Use SMTP send. If it fails, fallback to debug-printing OTP
-        email_status = send_email_smtp(final_email, otp_code)
-
-        if not email_status:
-             print(f"DEBUG OTP for {final_email}: {otp_code}")
-        return jsonify({
-        "status": "error",
-        "message": "Failed to send OTP email. Please try again later."
-    }), 500
-
+        # Send OTP via Resend API
+        if not send_otp_email(final_email, otp_code):
+            return jsonify({
+                "status": "error",
+                "message": "Failed to send OTP email. Please try again later."
+            }), 500
 
         return jsonify({
             "status": "success",
@@ -117,8 +101,10 @@ def resend_otp():
         db.session.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
 
+
 @otp_bp.route("/verify-otp", methods=["POST"])
 def verify_otp():
+    """Verify OTP entered by user."""
     try:
         user_id = session.get("user_id")
         data = request.get_json() or {}
@@ -154,8 +140,9 @@ def verify_otp():
                 db.session.commit()
 
             return jsonify({"status": "success", "message": "OTP verified"})
+
         else:
-            # debug mode (email verification flow without a stored user)
+            # Fallback mode (debug)
             print(f"DEBUG verify OTP for email={email}: {entered_otp}")
             return jsonify({"status": "success", "message": "OTP verified (debug mode)"})
 
